@@ -10,7 +10,8 @@ const inView = () => {
     /**
     * Fallback if window is undefined.
     */
-    if (typeof window === 'undefined') return;
+    console.log("type: ", typeof window.parent);
+    if (typeof window.parent === 'undefined') return;
 
     /**
     * How often and on what events we should check
@@ -41,16 +42,17 @@ const inView = () => {
     * which checks each registry.
     */
     triggers.forEach(event =>
-        addEventListener(event, check));
+        window.parent.addEventListener(event, check));
 
     /**
     * If supported, use MutationObserver to watch the
     * DOM and run checks on mutation.
     */
-    if (window.MutationObserver) {
+    if (window.parent.MutationObserver) {
         addEventListener('DOMContentLoaded', () => {
+            console.log(window.parent.document.body);
             new MutationObserver(check)
-                .observe(document.body, { attributes: true, childList: true, subtree: true });
+                .observe(window.parent.document.body, { attributes: true, childList: true, subtree: true });
         });
     }
 
@@ -61,9 +63,11 @@ const inView = () => {
     let control = (selector) => {
 
         if (typeof selector !== 'string') return;
+        console.log("selector", selector);
 
         // Get an up-to-date list of elements.
-        let elements = [].slice.call(document.querySelectorAll(selector));
+        console.log("selector:", window.parent.document.querySelectorAll(selector));
+        let elements = [].slice.call(window.parent.document.querySelectorAll(selector));
 
         // If the registry exists, update the elements.
         if (selectors.history.indexOf(selector) > -1) {
